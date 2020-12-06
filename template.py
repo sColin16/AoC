@@ -8,10 +8,10 @@ parser.add_argument("-t", "--test", action="store_true")
 args = parser.parse_args()
 
 if args.test:
-    raw = sys.stdin.read()
+    raw = sys.stdin.read().strip()
 
 else:
-    raw = open('xx-input.txt', 'r').read()
+    raw = open('xx-input.txt', 'r').read().strip()
 
 lines = raw.split('\n')
 
