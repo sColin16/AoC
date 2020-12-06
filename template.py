@@ -29,4 +29,4 @@ ans = 0
 
 
 
-print('Part2:', ans)
+print('Part 2:', ans)
