@@ -13,6 +13,7 @@ if args.test:
 
     with open('xx-test.txt', 'w') as f:
         f.write(raw)
+        f.write('\n')
 
 elif args.repeat_test:
     raw = open('xx-test.txt', 'r').read().strip()
