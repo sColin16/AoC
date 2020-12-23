@@ -22,6 +22,7 @@ else:
     raw = open('xx-input.txt', 'r').read().strip()
 
 lines = raw.split('\n')
+sections = [section.split('\n') for section in raw.split('\n\n')]
 
 try:
     nums = [int(line) for line in lines]
