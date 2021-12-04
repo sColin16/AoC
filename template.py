@@ -3,44 +3,24 @@ import sys
 import argparse
 import math
 
-parser = argparse.ArgumentParser()
-parser.add_argument("-t", "--test", action="store_true")
-parser.add_argument("-r", "--repeat_test", action="store_true")
-args = parser.parse_args()
+import sys
+sys.path.append('../')
 
-if args.test:
-    raw = sys.stdin.read().strip()
+from executor import *
+from helpers import *
 
-    with open('xx-test.txt', 'w') as f:
-        f.write(raw)
-        f.write('\n')
+def p1(raw, lines, sections, nums, *args, **kwargs):
+    ans = 0
 
-elif args.repeat_test:
-    raw = open('xx-test.txt', 'r').read().strip()
+    #START
 
-else:
-    raw = open('xx-input.txt', 'r').read().strip()
+    return ans
 
-lines = raw.split('\n')
-sections = [section.split('\n') for section in raw.split('\n\n')]
+def p2(raw, lines, sections, nums, *args, **kwargs):
+    ans = 0
 
-try:
-    nums = [int(line) for line in lines]
-except Exception as e:
-    pass
+    
 
-# Part 1
-ans = 0
+    return ans
 
-#START
-
-print('Part 1:', ans)
-
-###########################
-
-# Part 2
-ans = 0
-
-
-
-print('Part 2:', ans)
+run_solutions(p1, p2)
