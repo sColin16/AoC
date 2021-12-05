@@ -82,15 +82,8 @@ def p2(raw, lines, sections, nums, *args, **kwargs):
                 grid[y1][x] += 1
 
         else:
-            if x1 < x2:
-                seq1 = list(range(x1, x2+1))
-            else:
-                seq1 = list(range(x1, x2-1, -1))
-
-            if y1 < y2:
-                seq2 = list(range(y1, y2+1))
-            else:
-                seq2 = list(range(y1, y2-1, -1))
+            seq1 = list(drange(x1, x2))
+            seq2 = list(drange(y1, y2))
 
             for i in range(len(seq1)):
                 grid[seq2[i]][seq1[i]] += 1

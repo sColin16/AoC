@@ -33,3 +33,15 @@ def create_matrix(width, height, value):
 
     return matrix
 
+def drange(start, stop):
+    '''
+    Produces a range from start to stop, inclusive, with a step of 1 in the
+    appropriate direction
+    '''
+
+    if start < stop:
+        return range(start, stop + 1)
+
+    else:
+        return range(start, stop - 1, -1)
+
