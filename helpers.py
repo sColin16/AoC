@@ -50,3 +50,6 @@ def drange(start, stop):
 def get_regex_groups(pattern, string):
     return re.search(pattern, string).groups()
 
+def stoi_list(l):
+    return list(map(int, l))
+

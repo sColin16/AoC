@@ -18,7 +18,7 @@ def p1(raw, lines, sections, nums, *args, **kwargs):
     for line in lines:
         c = get_regex_groups("(\d+),(\d+) -> (\d+),(\d+)", line)
 
-        coords.append([int(num) for num in c])
+        coords.append(stoi_list(c))
 
     grid = create_matrix(SIZE, SIZE, 0)
 
@@ -52,7 +52,7 @@ def p2(raw, lines, sections, nums, *args, **kwargs):
     for line in lines:
         c = get_regex_groups("(\d+),(\d+) -> (\d+),(\d+)", line)
 
-        coords.append([int(num) for num in c])
+        coords.append(stoi_list(c))
 
     grid = create_matrix(SIZE, SIZE, 0)
 
