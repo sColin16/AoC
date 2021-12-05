@@ -1,3 +1,5 @@
+import re
+
 def section_to_matrix(section):
     '''
     Converts a series of lines with space-separated integers
@@ -44,4 +46,7 @@ def drange(start, stop):
 
     else:
         return range(start, stop - 1, -1)
+
+def get_regex_groups(pattern, string):
+    return re.search(pattern, string).groups()
 

@@ -16,11 +16,9 @@ def p1(raw, lines, sections, nums, *args, **kwargs):
 
     coords = []
     for line in lines:
-        a, b = line.split(' -> ')
-        x1, y1 = a.split(',')
-        x2, y2 = b.split(',')
+        c = get_regex_groups("(\d+),(\d+) -> (\d+),(\d+)", line)
 
-        coords.append((int(x1), int(y1), int(x2), int(y2)))
+        coords.append([int(num) for num in c])
 
     grid = create_matrix(SIZE, SIZE, 0)
 
@@ -52,11 +50,9 @@ def p2(raw, lines, sections, nums, *args, **kwargs):
 
     coords = []
     for line in lines:
-        a, b = line.split(' -> ')
-        x1, y1 = a.split(',')
-        x2, y2 = b.split(',')
+        c = get_regex_groups("(\d+),(\d+) -> (\d+),(\d+)", line)
 
-        coords.append((int(x1), int(y1), int(x2), int(y2)))
+        coords.append([int(num) for num in c])
 
     grid = create_matrix(SIZE, SIZE, 0)
 
