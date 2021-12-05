@@ -20,3 +20,16 @@ def transpose(matrix):
 
     return output
 
+def create_matrix(width, height, value):
+    matrix = []
+
+    for i in range(height):
+        row = []
+
+        for j in range(width):
+            row.append(value)
+
+        matrix.append(row)
+
+    return matrix
+

@@ -22,13 +22,7 @@ def p1(raw, lines, sections, nums, *args, **kwargs):
 
         coords.append((int(x1), int(y1), int(x2), int(y2)))
 
-    grid = []
-
-    for i in range(SIZE):
-        grid.append([])
-
-        for j in range(SIZE):
-            grid[i].append(0)
+    grid = create_matrix(SIZE, SIZE, 0)
 
     for coord in coords:
         x1, y1, x2, y2 = coord
@@ -69,13 +63,7 @@ def p2(raw, lines, sections, nums, *args, **kwargs):
 
         coords.append((int(x1), int(y1), int(x2), int(y2)))
 
-    grid = []
-
-    for i in range(SIZE):
-        grid.append([])
-
-        for j in range(SIZE):
-            grid[i].append(0)
+    grid = create_matrix(SIZE, SIZE, 0)
 
     for coord in coords:
         x1, y1, x2, y2 = coord
