@@ -31,16 +31,11 @@ def p1(raw, lines, sections, nums, *args, **kwargs):
             continue
 
         if x1 == x2:
-            t1 = min(y1, y2)
-            t2 = max(y1, y2)
-
-            for y in range(t1, t2+1):
+            for y in drange(y1, y2):
                 grid[y][x1] += 1
 
         elif y1 == y2:
-            t1 = min(x1, x2)
-            t2 = max(x1, x2)
-            for x in range(t1, t2+1):
+            for x in drange(x1, x2):
                 grid[y1][x] += 1
 
     for line in grid:
@@ -69,16 +64,11 @@ def p2(raw, lines, sections, nums, *args, **kwargs):
         x1, y1, x2, y2 = coord
 
         if x1 == x2:
-            t1 = min(y1, y2)
-            t2 = max(y1, y2)
-
-            for y in range(t1, t2+1):
+            for y in drange(y1, y2):
                 grid[y][x1] += 1
 
         elif y1 == y2:
-            t1 = min(x1, x2)
-            t2 = max(x1, x2)
-            for x in range(t1, t2+1):
+            for x in drange(x1, x2):
                 grid[y1][x] += 1
 
         else:
