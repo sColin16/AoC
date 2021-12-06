@@ -1,2 +1,2 @@
 # AoC
-My tools and solution for Advent of Code
+My tools and solutions for Advent of Code
