@@ -1,4 +1,5 @@
 import re
+from collections import defaultdict
 
 def section_to_matrix(section):
     '''
@@ -50,6 +51,22 @@ def drange(start, stop):
 def get_regex_groups(pattern, string):
     return re.search(pattern, string).groups()
 
-def stoi_list(l):
+def stoil(l):
+    '''
+    Converts a list of strings to a list of ints
+    '''
+
     return list(map(int, l))
+
+def count_freq(l):
+    '''
+    Produces a dictionary with the number each element appears in the list
+    '''
+
+    freq = defaultdict(int)
+
+    for element in l:
+        freq[element] += 1
+
+    return freq
 

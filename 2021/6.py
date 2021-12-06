@@ -14,7 +14,7 @@ from collections import defaultdict
 def p1(raw, lines, sections, nums, *args, **kwargs):
     ans = 0
 
-    ages = [int(n) for n in lines[0].split(',')]
+    ages = stoil(lines[0].split(','))
 
     DAYS = 80
     for i in range(DAYS):
@@ -37,13 +37,10 @@ def p1(raw, lines, sections, nums, *args, **kwargs):
 def p2(raw, lines, sections, nums, *args, **kwargs):
     ans = 0
 
-    aged = defaultdict(int)
-
     DAYS = 256
-    ages = [int(n) for n in lines[0].split(',')]
+    ages = stoil(lines[0].split(','))
 
-    for age in ages:
-        aged[age] += 1
+    aged = count_freq(ages)
 
     for i in range(DAYS):
         new_aged = defaultdict(int)
