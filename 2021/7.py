@@ -32,32 +32,26 @@ def p2(raw, lines, sections, nums, *args, **kwargs):
 
     p = stoil(lines[0].split(','))
     
-    # The mean is close to this b/c the total cost is n(n+1)/2
-    # It's not exact because of the n+1. I can't figure out the closed-form
-    # solution, but it seems to be within one of the mean...
-    # Still an O(n) solution... but maybe wrong on some inputs
-    m = round(mean(p))
+    m = mean(p)
 
-    a1 = 0
-    for i in p:
-        n = abs(i - m)
+    # xbar plus or minus 0.5 is a bound for the optimal real midpoint
+    # I look at all nearby integers to find the optimal integer midpoint
+    # It's possible that a tighter bound exists (e.g floor(xbar) to ceil(xbar))
+    m1 = math.floor(m - 0.5)
+    m2 = math.ceil(m + 0.5)
 
-        a1 += n* (n+1)/2
+    costs = []
+    for mid in range(m1, m2 + 1):
+        cost = 0
+        for i in p:
+            n = abs(i - mid)
 
-    a2 = 0
-    for i in p:
-        n = abs(i - m - 1)
+            cost += n * (n + 1) / 2
 
-        a2 += n * (n + 1) / 2
+        costs.append(cost)
 
-    a3 = 0
-    for i in p:
-        n = abs(i - m + 1)
+    ans = int(min(costs))
 
-        a3 += n * (n + 1) / 2
-
-    ans = min(a1, a2, a3)
-
-    return int(ans)
+    return ans
 
 run_solutions(p1, p2)
