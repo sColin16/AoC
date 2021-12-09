@@ -14,88 +14,57 @@ from helpers import *
 def p1(raw, lines, sections, nums, *args, **kwargs):
     ans = 0
 
-    c = []
-    for i, line in enumerate(lines):
-        for j, num in enumerate(line):
-            if i > 0:
-                if int(lines[i - 1][j]) <= int(num):
-                    continue
+    d = [stoil(list(line)) for line in lines]
+    g = Grid(d)
 
-            if i < len(lines) - 1:
-                if int(lines[i + 1][j]) <= int(num):
-                    continue
+    def is_low(r, c):
+        for a, b in g.get_adj4(r, c):
+            if g.get(a, b) <= g.get(r, c):
+                return False
 
-            if j > 0:
-                if int(lines[i][j - 1]) <= int(num):
-                    continue
+        return True
 
-            if j < len(line) - 1:
-                if int(lines[i][j + 1]) <= int(num):
-                    continue
-
-            c.append((i, j))
-
-    for a, b in c:
-        ans += int(lines[a][b]) + 1
+    for i in range(len(d)):
+        for j in range(len(d[0])):
+            if is_low(i, j):
+                ans += g.get(i, j) + 1
 
     return ans
 
 def p2(raw, lines, sections, nums, *args, **kwargs):
     ans = 0
 
+    d = [stoil(list(line)) for line in lines]
+    g = Grid(d)
+
     c = []
-    for i, line in enumerate(lines):
-        for j, num in enumerate(line):
-            if i > 0:
-                if int(lines[i - 1][j]) <= int(num):
-                    continue
 
-            if i < len(lines) - 1:
-                if int(lines[i + 1][j]) <= int(num):
-                    continue
+    def is_low(r, c):
+        for a, b in g.get_adj4(r, c):
+            if g.get(a, b) <= g.get(r, c):
+                return False
 
-            if j > 0:
-                if int(lines[i][j - 1]) <= int(num):
-                    continue
+        return True
 
-            if j < len(line) - 1:
-                if int(lines[i][j + 1]) <= int(num):
-                    continue
-
-            c.append((i, j))
-
-    for a, b in c:
-        ans += int(lines[a][b]) + 1
-
-    ans = 0
-
+    for i in range(len(d)):
+        for j in range(len(d[0])):
+            if is_low(i, j):
+                c.append((i, j))
     bs = []
 
     for a, b in c:
-        q = [(a, b)]
-        v = set()
-        v.add((a, b))
         size = 0
+        q = [(a, b)]
+        v = set([(a, b)])
 
         while len(q) > 0:
             size += 1
             i, j = q.pop(0)
 
-            if i > 0 and (i - 1, j) not in v and int(lines[i - 1][j]) > int(lines[i][j]) and int(lines[i - 1][j]) != 9:
-                q.append((i - 1, j))
-                v.add((i - 1, j))
-
-            if i < len(lines) - 1 and (i + 1, j) not in v and int(lines[i + 1][j]) > int(lines[i][j]) and int(lines[i + 1][j]) != 9:
-                q.append((i + 1, j))
-                v.add((i + 1, j))
-
-            if j > 0 and (i, j - 1) not in v and int(lines[i][j - 1]) > int(lines[i][j]) and int(lines[i][j - 1]) != 9:
-                q.append((i, j - 1))
-                v.add((i, j - 1))
-
-            if j < len(lines[0]) - 1 and (i, j + 1) not in v and int(lines[i][j + 1]) > int(lines[i][j]) and int(lines[i][j + 1]) != 9:
-                q.append((i, j + 1))
-                v.add((i, j + 1))
+            for r, c in g.get_adj4(i, j):
+                if (r, c) not in v and g.get(r, c) > g.get(i, j) and g.get(r, c) != 9:
+                    q.append((r, c))
+                    v.add((r, c))
 
         bs.append(size)
 
