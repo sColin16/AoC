@@ -69,17 +69,9 @@ def p2(raw, lines, sections, nums, *args, **kwargs):
 
                         for a, b in g.get_adj8(j, k):
                             g.content[a][b] += 1
-        def allf():
-            for j in range(10):
-                for k in range(10):
-                    if not flash[j][k]:
-                        return False
 
-            return True
-
-        if allf():
-            ans = i
-            break
+        if all([all(f) for f in flash]):
+            return i
 
         for j in range(10):
             for k in range(10):
@@ -87,7 +79,5 @@ def p2(raw, lines, sections, nums, *args, **kwargs):
                     g.content[j][k] = 0
 
         i += 1
-
-    return ans
 
 run_solutions(p1, p2)
