@@ -14,7 +14,7 @@ from helpers import *
 def p1(raw, lines, sections, nums, *args, **kwargs):
     ans = 0
 
-    d = [stoil(list(line)) for line in lines]
+    d = dmatrix(lines)
     g = Grid(d)
     for i in range(100):
         for j in range(10):
@@ -47,7 +47,7 @@ def p1(raw, lines, sections, nums, *args, **kwargs):
 def p2(raw, lines, sections, nums, *args, **kwargs):
     ans = 0
 
-    d = [stoil(list(line)) for line in lines]
+    d = dmatrix(lines)
     g = Grid(d)
     i = 1
     while True:

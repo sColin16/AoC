@@ -36,6 +36,13 @@ def create_matrix(width, height, value):
 
     return matrix
 
+def dmatrix(lines):
+    '''
+    Converts a grid of digits into a 2D list of integers
+    '''
+
+    return [stoil(list(line)) for line in lines]
+
 def drange(start, stop):
     '''
     Produces a range from start to stop, inclusive, with a step of 1 in the
@@ -107,3 +114,5 @@ class Grid:
 
         return [p for p in possible if self.valid(*p)]
 
+    def __repr__(self):
+        return '\n'.join([str(row) for row in self.content])
