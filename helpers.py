@@ -98,7 +98,7 @@ class Grid:
 
         return [p for p in possible if self.valid(*p)]
 
-    def get_adj8(row, col):
+    def get_adj8(self, row, col):
         '''
         Returns a list of vallid valid rows and columsn in the eight adjacent cells
         '''
