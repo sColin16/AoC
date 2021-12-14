@@ -46,10 +46,10 @@ def p1(raw, lines, sections, nums, *args, **kwargs):
 
     f = count_freq(list(s))
 
-    large = max([(value, key) for key, value in f.items()])
-    small = min([(value, key) for key, value in f.items()])
+    large = max([value for key, value in f.items()])
+    small = min([value for key, value in f.items()])
 
-    ans = large[0] - small[0]
+    ans = large - small
 
     return ans
 
@@ -88,11 +88,11 @@ def p2(raw, lines, sections, nums, *args, **kwargs):
     counts[lines[0][0]] += 1
     counts[lines[0][-1]] += 1
 
-    large = max([(value, key) for key, value in counts.items()])
-    small = min([(value, key) for key, value in counts.items()])
+    large = max([value for key, value in counts.items()])
+    small = min([value for key, value in counts.items()])
 
     # We double-counted all the letters, so divide by 2
-    ans = int((large[0] - small[0]) / 2)
+    ans = int((large - small) / 2)
 
     return ans
 
