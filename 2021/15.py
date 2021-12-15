@@ -11,105 +11,84 @@ sys.path.append('../')
 from executor import *
 from helpers import *
 
-# This is comically slow for part 2
+from heapq import *
+from math import inf
+
 def p1(raw, lines, sections, nums, *args, **kwargs):
-    ans = 0
+    g = Grid(dmatrix(lines))
+    distances = defaultdict(lambda: inf)
 
-    d = [stoil(list(line)) for line in lines]
-
-    g = Grid(d)
-
-    ds = create_matrix(len(lines[0]) * 5, len(lines) * 5, 1000000000)
-    ds[0][0] = 0
     done = set()
+    distances[(0, 0)] = 0
+    heap = [(0, (0, 0))]
 
-    q = [(0, 0)]
-    while len(q) > 0:
-        min_d = 100000000000000
-        min_c = None
-        for e in q:
-            if ds[e[0]][e[1]] < min_d:
-                min_c = e
-                min_d = ds[e[0]][e[1]]
+    while len(heap) > 0:
+        distance, coord = heappop(heap)
 
-        q.remove(min_c)
+        # Skip if this node was processed at a shorter distance
+        if coord in done:
+            continue
 
-        if min_c[0] == len(lines) - 1 and min_c[1] == len(lines[0]) - 1:
-            ans = min_d
-            break
+        # If we are processing the target coordinate, we have found the solution
+        if coord == (g.width - 1, g.height - 1):
+            return distance
 
-        for a, b in g.get_adj4(min_c[0], min_c[1]):
-            if (a, b) in done or (a, b) in q:
-                continue
+        for r, c in g.get_adj4(*coord):
+            if (r, c) not in done and distance + g.get(r, c) < distances[(r, c)]:
+                # Relaxation step
+                new_dist = distance + g.get(r, c)
+                distances[(r, c)] = new_dist
 
-            if min_d + g.get(b, a) < ds[a][b]:
-                ds[a][b] = min_d + g.get(a, b)
+                # Add the point to the priority queue
+                heappush(heap, (new_dist, (r, c)))
 
-            q.append((a, b))
-
-        done.add((min_c[0], min_c[1]))
-
-    return ans
+        # Mark the node as processed
+        done.add(coord)
 
 def p2(raw, lines, sections, nums, *args, **kwargs):
     ans = 0
 
-    d = [stoil(list(line)) for line in lines]
-    dnew = []
+    original_tile = dmatrix(lines)
+    width = len(lines[0])
+    height = len(lines)
+    all_tiles = create_matrix(5 * width, 5 * height, 0)
 
-    for line in d:
-        row = []
-        for i in range(5):
-            for element in line:
-                row.append((element + i - 1) % 9 + 1)
+    for i in range(height):
+        for j in range(width):
+            for k in range(5):
+                for l in range(5):
+                    all_tiles[i + k * height][j + l * width] =\
+                        (original_tile[i][j] + k + l - 1) % 9 + 1
 
-        dnew.append(row)
 
-    dnew2 = []
+    g = Grid(all_tiles)
+    distances = defaultdict(lambda: inf)
 
-    for i in range(5):
-        for line in dnew:
-            row = []
-            for element in line:
-                row.append((element + i - 1) % 9 + 1)
-
-            dnew2.append(row)
-
-    d = dnew2
-
-    g = Grid(d)
-
-    ds = create_matrix(len(lines[0]) * 5, len(lines) * 5, 1000000000)
-    ds[0][0] = 0
     done = set()
+    distances[(0, 0)] = 0
+    heap = [(0, (0, 0))]
 
-    q = [(0, 0)]
-    while len(q) > 0:
-        min_d = 100000000000000
-        min_c = None
-        for e in q:
-            if ds[e[0]][e[1]] < min_d:
-                min_c = e
-                min_d = ds[e[0]][e[1]]
+    while len(heap) > 0:
+        distance, coord = heappop(heap)
 
-        q.remove(min_c)
+        # Skip if this node was processed at a shorter distance
+        if coord in done:
+            continue
 
-        if min_c[0] == len(lines) * 5 - 1 and min_c[1] == len(lines[0]) * 5 - 1:
-            ans = min_d
-            break
+        # If we are processing the target coordinate, we have found the solution
+        if coord == (g.height - 1, g.width - 1):
+            return distance
 
-        for a, b in g.get_adj4(min_c[0], min_c[1]):
-            if (a, b) in done or (a, b) in q:
-                continue
+        for r, c in g.get_adj4(*coord):
+            if (r, c) not in done and distance + g.get(r, c) < distances[(r, c)]:
+                # Relaxation step
+                new_dist = distance + g.get(r, c)
+                distances[(r, c)] = new_dist
 
-            if min_d + g.get(b, a) < ds[a][b]:
-                ds[a][b] = min_d + g.get(a, b)
+                # Add the point to the priority queue
+                heappush(heap, (new_dist, (r, c)))
 
-            q.append((a, b))
-
-        done.add((min_c[0], min_c[1]))
-    
-
-    return ans
+        # Mark the node as processed
+        done.add(coord)
 
 run_solutions(p1, p2)
