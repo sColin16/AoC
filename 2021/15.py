@@ -46,8 +46,6 @@ def p1(raw, lines, sections, nums, *args, **kwargs):
         done.add(coord)
 
 def p2(raw, lines, sections, nums, *args, **kwargs):
-    ans = 0
-
     original_tile = dmatrix(lines)
     width = len(lines[0])
     height = len(lines)
