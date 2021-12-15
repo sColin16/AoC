@@ -33,14 +33,14 @@ def p1(raw, lines, sections, nums, *args, **kwargs):
         if coord == (g.width - 1, g.height - 1):
             return distance
 
-        for r, c in g.get_adj4(*coord):
-            if (r, c) not in done and distance + g.get(r, c) < distances[(r, c)]:
+        for test_coord in g.get_adj4(*coord):
+            if test_coord not in done and distance + g.get(*test_coord) < distances[test_coord]:
                 # Relaxation step
-                new_dist = distance + g.get(r, c)
-                distances[(r, c)] = new_dist
+                new_dist = distance + g.get(*test_coord)
+                distances[test_coord] = new_dist
 
                 # Add the point to the priority queue
-                heappush(heap, (new_dist, (r, c)))
+                heappush(heap, (new_dist, test_coord))
 
         # Mark the node as processed
         done.add(coord)
@@ -79,14 +79,14 @@ def p2(raw, lines, sections, nums, *args, **kwargs):
         if coord == (g.height - 1, g.width - 1):
             return distance
 
-        for r, c in g.get_adj4(*coord):
-            if (r, c) not in done and distance + g.get(r, c) < distances[(r, c)]:
+        for test_coord in g.get_adj4(*coord):
+            if test_coord not in done and distance + g.get(*test_coord) < distances[test_coord]:
                 # Relaxation step
-                new_dist = distance + g.get(r, c)
-                distances[(r, c)] = new_dist
+                new_dist = distance + g.get(*test_coord)
+                distances[test_coord] = new_dist
 
                 # Add the point to the priority queue
-                heappush(heap, (new_dist, (r, c)))
+                heappush(heap, (new_dist, test_coord))
 
         # Mark the node as processed
         done.add(coord)
