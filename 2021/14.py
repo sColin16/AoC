@@ -3,7 +3,7 @@ import sys
 import argparse
 import math
 
-from collections import defaultdict
+from collections import defaultdict, Counter
 
 import sys
 sys.path.append('../')
@@ -22,34 +22,20 @@ def p1(raw, lines, sections, nums, *args, **kwargs):
 
     s = lines[0]
 
-    pairs = defaultdict(int)
-    for j in range(len(s) - 1):
-        pairs[s[j:j+2]] += 1
-
     for i in range(10):
-        newp = defaultdict(int)
-        ins = [''] * (len(s) - 1)
-
+        news = ''
         for j in range(len(s) - 1):
+            news += s[j]
+
             if s[j:j+2] in d:
-                ins[j] = d[s[j:j+2]]
+                news += d[s[j:j+2]]
 
-        new = ''
+        s = news + s[-1]
 
-        for j in range(len(s) - 1):
-            new += s[j]
-            new += ins[j]
+    counts = Counter(s)
+    sort = counts.most_common()
 
-        new += s[-1]
-
-        s = new
-
-    f = count_freq(list(s))
-
-    large = max([value for key, value in f.items()])
-    small = min([value for key, value in f.items()])
-
-    ans = large - small
+    ans = sort[0][1] - sort[-1][1]
 
     return ans
 
@@ -88,11 +74,10 @@ def p2(raw, lines, sections, nums, *args, **kwargs):
     counts[lines[0][0]] += 1
     counts[lines[0][-1]] += 1
 
-    large = max([value for key, value in counts.items()])
-    small = min([value for key, value in counts.items()])
+    counts = Counter(counts)
+    sort = counts.most_common()
 
-    # We double-counted all the letters, so divide by 2
-    ans = int((large - small) / 2)
+    ans = int((sort[0][1] - sort[-1][1])/2)
 
     return ans
 

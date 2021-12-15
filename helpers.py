@@ -65,18 +65,6 @@ def stoil(l):
 
     return list(map(int, l))
 
-def count_freq(l):
-    '''
-    Produces a dictionary with the number each element appears in the list
-    '''
-
-    freq = defaultdict(int)
-
-    for element in l:
-        freq[element] += 1
-
-    return freq
-
 class Grid:
     '''
     A helper class to encapsulate all the annoying 2D grid stuff
