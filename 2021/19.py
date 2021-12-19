@@ -19,7 +19,7 @@ def get_rotation_matrices():
 
     for order in permutations([0, 1, 2]):
 
-        signs = [[1, -1], [1, -1], [1, -1]]
+        signs = [[1, -1]] * 3
 
         for x, y, z in product(*signs):
             matrix = create_matrix(3, 3, 0)
@@ -56,15 +56,13 @@ class Translation:
         self.matrix = matrix
         self.pos = pos
 
-def extract_matches(rowA, rowB):
+def extract_match(rowA, rowB):
     result = {}
 
     for i, a in enumerate(rowA):
         for j, b in enumerate(rowB):
             if a == b:
-                result[i] = j
-
-    return result
+                return (i, j)
 
 def diff(c1, c2):
     return [c1[i] - c2[i] for i in range(3)]
@@ -76,19 +74,24 @@ def negate(c1):
     return [-c1[i] for i in range(3)]
 
 def p1(raw, lines, sections, nums, *args, **kwargs):
-    ans = 0
-
+    # Input parsing: store the measurements from each scanner in a multidimensional array
     beacons = []
+
     for section in sections:
         section = section[1:]
 
         row = []
         for line in section:
-            row.append(list(map(int, line.split(','))))
+            row.append(stoil(line.split(',')))
 
         beacons.append(row)
 
+    # Compute relative distances between all beacons: this is how we determine overlap
+    # all_distances[i][j][k][l] represents the distances between beacons for scanner i under rotation j between beacons k and l
     all_distances = []
+
+    # All 24 rotations are represnted by a 3x3 rotation matrix
+    rm = get_rotation_matrices()
 
     for beacon in beacons:
         distances = create_matrix(len(beacon), len(beacon), [0, 0, 0])
@@ -101,47 +104,65 @@ def p1(raw, lines, sections, nums, *args, **kwargs):
 
                 distances[i][j] = [xdist, ydist,zdist]
 
-        #print(*distances, sep='\n')
-        #print()
+        rotated_distances = [transform(distances, m) for m in rm]
 
-        all_distances.append(distances)
+        all_distances.append(rotated_distances)
 
-    rm = get_rotation_matrices()
+    # When we find overlap, we record the way to convert between beacon coordiante systems
+    # translations[i][j] stores the way to convert from beacon j to beacon i's coordinate system
     translations = create_matrix(len(beacons), len(beacons), None)
 
+    # The number of matches required to consider the beacons sufficiently overlapped
     MATCH = 12
+
+    # Iterate over every pair of scanners to identify overlaps between them
     for i in range(len(beacons)):
-        first = all_distances[i]
+        first = all_distances[i][0]
 
         for j in range(i + 1, len(beacons)):
-            second = all_distances[j]
+            second_all = all_distances[j]
 
-            mmatch = 0
             found = False
-            for k, m in enumerate(rm):
-                t = transform(second, m)
 
-                for fr in first:
-                    for sr in t:
+            # Iterate over all rotations of the second beacon's coordinate system
+            for k, second in enumerate(second_all):
+                m = rm[k]
+
+                # Iterate over all rows in the two idstance matrices
+                # Skip the final 11 (or MATCH-1) rows because 12 rows should match
+                for fr in first[:-(MATCH-1)]:
+                    for sr in second[:-(MATCH-1)]:
                         matches = count_matches(fr, sr)
 
                         if matches == 12:
-                            #print('Bingo', i, j, k)
-                            cv = extract_matches(fr, sr)
-                            f = list(cv.items())[0]
-                            first_beacon_A = beacons[i][f[0]]
-                            first_beacon_B = np.matmul(m, beacons[j][f[1]])
+                            # Determine the indices of two matching beacons
+                            a_idx, b_idx = extract_match(fr, sr)
 
+                            # Get coordinates of matching beacon relative to the first scanner
+                            first_beacon_A = beacons[i][a_idx]
+
+                            # Get coordinates of matching beacon, but transformed so that
+                            # both coordinate systems are in the same rotational frame
+                            first_beacon_B = np.matmul(m, beacons[j][b_idx])
+
+                            # Determine the position of the second scanner relative to the first
                             posB = diff(first_beacon_A, first_beacon_B)
 
-                            translation = Translation(m, posB)
-                            translations[i][j] = translation
+                            # Determine the rotation matrix to go from A -> B instead of B -> A
+                            # This should just be the transpose since it's orthogonal
+                            inv_m = np.linalg.inv(m)
 
-                            translationB = Translation(np.linalg.inv(m), np.matmul(np.linalg.inv(m), negate(posB)))
+                            # Determine the position of the first relative relative to the second
+                            inv_pos = np.matmul(inv_m, negate(posB))
+
+                            # Store the translations in the translation matrix
+                            translationA = Translation(m, posB)
+                            translationB = Translation(inv_m, inv_pos)
+
+                            translations[i][j] = translationA
                             translations[j][i] = translationB
 
-                            print(i, j, k, posB)
-                            print(j, i, np.linalg.inv(m), np.matmul(np.linalg.inv(m), negate(posB)))
+                            print(f'Found match between {i} and {j} for rotation {k}')
 
                             found = True
                             break
@@ -152,32 +173,46 @@ def p1(raw, lines, sections, nums, *args, **kwargs):
                 if found:
                     break
 
-    # Find all the mappings from a beacon to beacon 0
+
+    # We have a partial table of translations between scanners
+    # We fill out the entire table so we have translations for all scanners relative to scanner 0
     changed = True
-    while changed:
+    while changed:          # It is necessary to run this a couple times to fill everything in
         changed = False
+
+        # Iterate over every cell in the translation matrix
         for i in range(len(translations)):
             for j in range(len(translations)):
+
+                # If we find an existing translation, we leverage it to create other translations
                 if i != j and translations[i][j] is not None:
+
+                    # Iterate over every column in row j to find translations we can leverage
                     for k in range(len(translations)):
+
+                        # If we found a translation that will let us fill in a part of the table
+                        # We compute the translation
                         if i != k and translations[j][k] is not None and translations[i][k] is None:
-                            pos = add(np.matmul(translations[i][j].matrix, translations[j][k].pos), translations[i][j].pos)
+                            # Leverage linear algebgra to chain the rotation matrices
                             mat = np.matmul(translations[i][j].matrix, translations[j][k].matrix)
+
+                            pos = add(np.matmul(translations[i][j].matrix, translations[j][k].pos), translations[i][j].pos)
 
                             translations[i][k] = Translation(mat, pos)
                             changed = True
-                            print('tran', i, k, pos)
+                            print(f'Computed translation between {i} and {k}')
 
+    # We throw all the final coordinates in a set to eliminate duplicates
     final = set()
 
-    for beacon in beacons[0]:
-        final.add(tuple(beacon))
-
+    # Iterate over all the scanners to add their beacons relative to scanner 0
     for i, group in enumerate(beacons):
+        # No translations needed for scanner 0
         if i == 0:
             for beacon in group:
                 final.add(tuple(beacon))
 
+        # Otherwise use the translation to place beacon locations relative to scanner 0 in set
         else:
             for beacon in group:
                 trans = np.matmul(translations[0][i].matrix, beacon)
@@ -185,18 +220,21 @@ def p1(raw, lines, sections, nums, *args, **kwargs):
 
                 final.add(tuple(trans))
 
-    print(len(final))
+    print(f'Total beacons: {len(final)}')
 
+    # Also do part 2 since my solution is kinda slow
+    # Just iterate over all the pairs of beacons to get the distances
     d = 0
     for i in range(1, len(beacons)):
         for j in range(i + 1, len(beacons)):
-            newd = abs(translations[0][i].pos[0] - translations[0][j].pos[0]) + abs(translations[0][i].pos[1] - translations[0][j].pos[1]) + abs(translations[0][i].pos[2] - translations[0][j].pos[2])
+            dist_vec = diff(translations[0][i].pos, translations[0][j].pos)
+            newd = int(sum([abs(elem) for elem in dist_vec]))
 
             d = max(d, newd)
 
-    print(d)
+    print(f'Maximum L-1 distance between beacons: {d}')
 
-    return ans
+    return len(final), d
 
 def p2(raw, lines, sections, nums, *args, **kwargs):
     ans = 0
