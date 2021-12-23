@@ -84,7 +84,7 @@ def size(r):
 def p2(raw, lines, sections, nums, *args, **kwargs):
     ans = 0
 
-    regions = []
+    regions = set()
 
     for line in lines:
         s, info = line.split(' ')
@@ -117,10 +117,10 @@ def p2(raw, lines, sections, nums, *args, **kwargs):
                     cube = (*cube[0], *cube[1], *cube[2])
 
                     if size(cube) > 0 and cube != o:
-                        regions.append(cube)
+                        regions.add(cube)
 
         if s == 'on':
-            regions.append(t)
+            regions.add(t)
             pass
 
     for region in regions:
