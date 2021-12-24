@@ -1,5 +1,6 @@
 import re
 from collections import defaultdict
+from queue import SimpleQueue, PriorityQueue
 
 def section_to_matrix(section):
     '''
@@ -104,3 +105,73 @@ class Grid:
 
     def __repr__(self):
         return '\n'.join([str(row) for row in self.content])
+
+def flood_fill(start_node, get_neighbors, hashable_transform=lambda x: x):
+    '''
+    Returns a dictionary of the distance to all connected nodes
+    Assumes an unweighted graph
+
+    start_node is a representation of the node to start at
+    get_neighbors is a callback that is passed a node and should return all valid neighrbors
+    hashable_transform is a callback to transform a node into a hashable type, if necessary
+    '''
+
+    hashable_start = hashable_transform(start_node)
+
+    q = SimpleQueue()
+
+    q.put((start_node, 0))
+    visited = set([hashable_start])
+    distances = {
+        hashable_start: 0
+    }
+
+    while q.qsize() > 0:
+        node, distance = q.get()
+
+        for neighbor in get_neighbors(node):
+            hashable_neighbor = hashable_transform(neighbor)
+
+            if hashable_neighbor not in visited:
+                q.put((neighbor, distance + 1))
+                visited.add(hashable_transform(neighbor))
+                distances[hashable_neighbor] = distance + 1
+
+    return distances
+
+def dijsktras(start_node, target_node, get_neighbors, hashable_transform=lambda x: x):
+    '''
+    Returns the minimum cost to reach the target node from the start node
+
+    get_neighbors should return a list of (node, cost) tuples
+    '''
+
+    hashable_start = hashable_transform(start_node)
+
+    q = PriorityQueue()
+    processed = set()
+
+    # Store the hash in case there are collisions with distance
+    q.put((0, hash(hashable_start), start_node))
+
+    while q.qsize() > 0:
+        distance, h, node = q.get()
+
+        hashable_node = hashable_transform(node)
+
+        if hashable_node in processed:
+            continue
+
+        if node == target_node:
+            return distance
+
+        processed.add(hashable_node)
+
+        for neighbor, cost in get_neighbors(node):
+            hashable_neighbor = hashable_transform(neighbor)
+
+            if hashable_neighbor not in processed:
+                q.put((distance + cost, hash(hashable_neighbor), neighbor))
+
+    return None
+
