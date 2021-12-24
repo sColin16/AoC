@@ -11,7 +11,7 @@ sys.path.append('../')
 from executor import *
 from helpers import *
 
-def flood(state, r, c, l, depth):
+def gen_valid(depth):
     valid = set([(1, i + 1) for i in range(11)])
 
     for i in range(2, depth + 2):
@@ -20,18 +20,25 @@ def flood(state, r, c, l, depth):
         valid.add((i, 7))
         valid.add((i, 9))
 
+    return valid
+
+VALID = {
+    2: gen_valid(2),
+    4: gen_valid(4)
+}
+
+def flood(state, r, c, l, depth):
     def get_neighbors(loc):
+        valid = VALID[depth]
         a, b = loc
 
         possible = [(a + 1, b), (a - 1, b), (a, b + 1), (a, b - 1)]
-        valid_cells = [p for p in possible if p in valid]
-
-        return [p for p in valid_cells if state.get(p) is None]
+        return [p for p in possible if p in valid and state.get(p) is None]
 
     return flood_fill((r, c), get_neighbors)
 
 def hash_d(d):
-    return tuple(sorted([(key, val) for key, val in d.items()]))
+    return tuple(sorted(d.items()))
 
 def vis(state, depth):
     for i in range(11):

@@ -1,6 +1,7 @@
 import re
 from collections import defaultdict
-from queue import SimpleQueue, PriorityQueue
+from queue import SimpleQueue
+import heapq
 
 def section_to_matrix(section):
     '''
@@ -148,14 +149,14 @@ def dijsktras(start_node, target_node, get_neighbors, hashable_transform=lambda 
 
     hashable_start = hashable_transform(start_node)
 
-    q = PriorityQueue()
+    q = []
     processed = set()
 
     # Store the hash in case there are collisions with distance
-    q.put((0, hash(hashable_start), start_node))
+    heapq.heappush(q, (0, hash(hashable_start), start_node))
 
-    while q.qsize() > 0:
-        distance, h, node = q.get()
+    while len(q) > 0:
+        distance, h, node = heapq.heappop(q)
 
         hashable_node = hashable_transform(node)
 
@@ -171,7 +172,7 @@ def dijsktras(start_node, target_node, get_neighbors, hashable_transform=lambda 
             hashable_neighbor = hashable_transform(neighbor)
 
             if hashable_neighbor not in processed:
-                q.put((distance + cost, hash(hashable_neighbor), neighbor))
+                heapq.heappush(q, (distance + cost, hash(hashable_neighbor), neighbor))
 
     return None
 
