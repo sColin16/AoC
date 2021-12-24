@@ -172,6 +172,25 @@ def p1(raw, lines, sections, nums, *args, **kwargs):
 
     return ans
 
+def count_models(inputs):
+    # Stores the number of candidate solutions associated with each target z value
+    q = {
+        0: 1
+    }
+
+    for i in reversed(range(14)):
+        new_q = defaultdict(int)
+
+        for target_z, p_sol in q.items():
+            sols = solve(inputs[i], target_z)
+
+            for w, z in sols:
+                new_q[z] += p_sol
+
+        q = new_q
+
+    return q[0]
+
 def p2(raw, lines, sections, nums, *args, **kwargs):
     inputs = get_inputs(lines)
 
@@ -197,6 +216,8 @@ def p2(raw, lines, sections, nums, *args, **kwargs):
         q = new_q
 
     ans = ''.join(str(a) for a in q[0])
+
+    print(f'BONUS: Number of model numbers accepted {count_models(inputs)}')
 
     return ans
 
