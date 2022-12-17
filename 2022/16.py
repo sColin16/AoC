@@ -26,6 +26,7 @@ class Node:
     children: List[str]
     achildren: List[str]
 
+hits = 0
 def p1(raw, lines, sections, nums, *args, **kwargs):
     ans = 0
 
@@ -173,7 +174,6 @@ def p2(raw, lines, sections, nums, *args, **kwargs):
             pres_index[label] = len(pres_index)
 
     comp_graph = {}
-    print(pres_index)
 
     for start in comp_nodes:
         q = set([(start, 0)])
@@ -205,50 +205,83 @@ def p2(raw, lines, sections, nums, *args, **kwargs):
         n1_active = (activated >> pres_index[n1]) & 1
         n2_active = (activated >> pres_index[n2]) & 1
 
+        # print(n1_active, n2_active)
+
         best = 0
-        if t1 >= 1 and t2 >= 1 and not n1_active and not n2_active and n1 != n2:
-            nset = activated + (1 << pres_index[n1]) + (1 << pres_index[n2])
-
-            next_sol = solve((n1, n2, nset, t1 - 1, t2 - 1))
-            value = (graph[n1].rate) * (t1 - 1) + (graph[n2].rate) * (t2 - 1)
-            cand_val = value + next_sol
-
-            best = max(best, cand_val)
-
-        if t1 >= 1 and not n1_active:
-            nset = activated + (1 << pres_index[n1])
-
-            value = (graph[n1].rate) * (t1 - 1)
-
-            for neighbor, d in comp_graph[n2].children:
-                next_sol = solve((n1, neighbor, nset, t1 - 1, max(0, t2 - d)))
-                cand_val = value + next_sol
-                best = max(best, cand_val)
-
-        if t2 >= 1 and not n2_active:
+        if t1 < t2:
+            # Process a move by t2 to keep the values similar
             nset = activated + (1 << pres_index[n2])
-
             value = (graph[n2].rate) * (t2 - 1)
 
-            for neighbor, d in comp_graph[n1].children:
-                next_sol = solve((neighbor, n2, nset, max(0, t1 - d), t2 - 1))
-                cand_val = value + next_sol
-                best = max(best, cand_val)
+            if nset == 2 ** (len(pres_index)) - 1:
+                best = value
 
-        for (neighbor1, d1), (neighbor2, d2) in itertools.product(comp_graph[n1].children, comp_graph[n2].children):
-            best = max(best, solve((neighbor1, neighbor2, activated, max(0, t1 - d1), max(0, t2 - d2))))
+            else:
+                for neighbor, d in comp_graph[n2].children:
+                    if not ((nset >> pres_index[neighbor]) & 1) and n1 != neighbor:
+                        next_sol = solve((n1, neighbor, nset, t1, max(0, t2 - 1 - d)))
+                        cand_val = value + next_sol
+                        best = max(best, cand_val)
+
+        else:
+            # Process a move by t1 to keep the values similar
+            nset = activated + (1 << pres_index[n1])
+            value = (graph[n1].rate) * (t1 - 1)
+
+            if nset == 2 ** (len(pres_index)) - 1:
+                best = value
+
+            for neighbor, d in comp_graph[n1].children:
+                if not ((nset >> pres_index[neighbor]) & 1) and n2 != neighbor:
+                    next_sol = solve((neighbor, n2, nset, max(0, t1 - 1 - d), t2))
+                    cand_val = value + next_sol
+                    best = max(best, cand_val)
 
         m[inp] = best
         if len(m) % 10000 == 0:
             print(len(m))
         return m[inp]
 
+        # if t1 >= 1 and t2 >= 1 and not n1_active and not n2_active and n1 != n2:
+        #     nset = activated + (1 << pres_index[n1]) + (1 << pres_index[n2])
+
+        #     next_sol = solve((n1, n2, nset, t1 - 1, t2 - 1))
+        #     value = (graph[n1].rate) * (t1 - 1) + (graph[n2].rate) * (t2 - 1)
+        #     cand_val = value + next_sol
+
+        #     best = max(best, cand_val)
+
+        # if t1 >= 1 and not n1_active:
+        #     nset = activated + (1 << pres_index[n1])
+
+        #     value = (graph[n1].rate) * (t1 - 1)
+
+        #     for neighbor, d in comp_graph[n2].children:
+        #         next_sol = solve((n1, neighbor, nset, t1 - 1, max(0, t2 - d)))
+        #         cand_val = value + next_sol
+        #         best = max(best, cand_val)
+
+        # if t2 >= 1 and not n2_active:
+        #     nset = activated + (1 << pres_index[n2])
+
+        #     value = (graph[n2].rate) * (t2 - 1)
+
+        #     for neighbor, d in comp_graph[n1].children:
+        #         next_sol = solve((neighbor, n2, nset, max(0, t1 - d), t2 - 1))
+        #         cand_val = value + next_sol
+        #         best = max(best, cand_val)
+
+        # for (neighbor1, d1), (neighbor2, d2) in itertools.product(comp_graph[n1].children, comp_graph[n2].children):
+        #     best = max(best, solve((neighbor1, neighbor2, activated, max(0, t1 - d1), max(0, t2 - d2))))
+
+
 
     # ans = solve(('AA', 'AA', frozenset(), 26, 26))
     ans = 0
     for (n1, d1), (n2, d2) in itertools.product(comp_graph['AA'].children, comp_graph['AA'].children):
-        print(n1, n2)
-        ans = max(ans, solve((n1, n2, 0, 26 - d1, 26 - d2)))
+        if n1 != n2:
+            ans = max(ans, solve((n1, n2, 0, 26 - d1, 26 - d2)))
+    print(hits)
     print(len(m))
 
     return ans
