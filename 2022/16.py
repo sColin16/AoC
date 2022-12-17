@@ -208,32 +208,49 @@ def p2(raw, lines, sections, nums, *args, **kwargs):
         # print(n1_active, n2_active)
 
         best = 0
-        if t1 < t2:
-            # Process a move by t2 to keep the values similar
+
+        # Simulate n2 moving
+        if not n2_active:
             nset = activated + (1 << pres_index[n2])
             value = (graph[n2].rate) * (t2 - 1)
 
             if nset == 2 ** (len(pres_index)) - 1:
-                best = value
+                best = max(best, value)
 
             else:
+                found = 0
                 for neighbor, d in comp_graph[n2].children:
                     if not ((nset >> pres_index[neighbor]) & 1) and n1 != neighbor:
+                        found += 1
                         next_sol = solve((n1, neighbor, nset, t1, max(0, t2 - 1 - d)))
                         cand_val = value + next_sol
                         best = max(best, cand_val)
 
-        else:
-            # Process a move by t1 to keep the values similar
+                if found == 0:
+                    next_sol = solve((n1, n2, nset, t1, 0))
+                    cand_val = value + next_sol
+                    best = max(best, cand_val)
+
+
+        # Simulate n1 moving
+        if not n1_active:
             nset = activated + (1 << pres_index[n1])
             value = (graph[n1].rate) * (t1 - 1)
 
             if nset == 2 ** (len(pres_index)) - 1:
-                best = value
+                best = max(best, value)
 
-            for neighbor, d in comp_graph[n1].children:
-                if not ((nset >> pres_index[neighbor]) & 1) and n2 != neighbor:
-                    next_sol = solve((neighbor, n2, nset, max(0, t1 - 1 - d), t2))
+            else:
+                found = 0
+                for neighbor, d in comp_graph[n1].children:
+                    if not ((nset >> pres_index[neighbor]) & 1) and n2 != neighbor:
+                        found += 1
+                        next_sol = solve((neighbor, n2, nset, max(0, t1 - 1 - d), t2))
+                        cand_val = value + next_sol
+                        best = max(best, cand_val)
+
+                if found == 0:
+                    next_sol = solve((n1, n2, nset, 0, t2))
                     cand_val = value + next_sol
                     best = max(best, cand_val)
 
