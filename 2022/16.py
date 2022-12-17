@@ -210,7 +210,7 @@ def p2(raw, lines, sections, nums, *args, **kwargs):
         best = 0
 
         # Simulate n2 moving
-        if not n2_active:
+        if t2 > 0 and not n2_active:
             nset = activated + (1 << pres_index[n2])
             value = (graph[n2].rate) * (t2 - 1)
 
@@ -226,6 +226,7 @@ def p2(raw, lines, sections, nums, *args, **kwargs):
                         cand_val = value + next_sol
                         best = max(best, cand_val)
 
+                # This isn't right, it's possible 2 should take it
                 if found == 0:
                     next_sol = solve((n1, n2, nset, t1, 0))
                     cand_val = value + next_sol
@@ -233,7 +234,7 @@ def p2(raw, lines, sections, nums, *args, **kwargs):
 
 
         # Simulate n1 moving
-        if not n1_active:
+        if t1 > 0 and not n1_active:
             nset = activated + (1 << pres_index[n1])
             value = (graph[n1].rate) * (t1 - 1)
 
