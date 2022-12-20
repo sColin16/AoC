@@ -110,26 +110,28 @@ def solve2(inp):
     clay_build = (ore >= b and clay_robs < d)
     ore_build = (ore >= a and ore_robs < max(a, b, c, e))
 
-    p = 2
+    ore_cap = (max(a, b, c, e) - ore_robs) * (time - 1) + ore_robs
+    clay_cap = (d - clay_robs) * (time - 1) + clay_robs
+    ob_cap = (f - ob_robs) * (time - 1) + ob_robs
     sol = 0
     if geo_build:
-        pos_sol = solve2((blueprint, ore_robs, clay_robs, ob_robs, geo_robs + 1, min(new_ore - e, p * max(a, b, c, e)), min(new_clay, p * d), min(new_ob - f, p * f), time - 1))
+        pos_sol = solve2((blueprint, ore_robs, clay_robs, ob_robs, geo_robs + 1, min(new_ore - e, ore_cap), min(new_clay, clay_cap), min(new_ob - f, ob_cap), time - 1))
         sol = max(sol, pos_sol)
 
     if ob_build:
-        pos_sol = solve2((blueprint, ore_robs, clay_robs, ob_robs + 1, geo_robs, min(new_ore - c, p * max(a, b, c, e)), min(new_clay - d, p * d), min(new_ob, p * f), time - 1))
+        pos_sol = solve2((blueprint, ore_robs, clay_robs, ob_robs + 1, geo_robs, min(new_ore - c, ore_cap), min(new_clay - d, clay_cap), min(new_ob, ob_cap), time - 1))
         sol = max(sol, pos_sol)
 
     if clay_build:
-        pos_sol = solve2((blueprint, ore_robs, clay_robs + 1, ob_robs, geo_robs, min(new_ore - b, p * max(a, b, c, e)), min(new_clay, p * d), min(new_ob, p * f), time - 1))
+        pos_sol = solve2((blueprint, ore_robs, clay_robs + 1, ob_robs, geo_robs, min(new_ore - b, ore_cap), min(new_clay, clay_cap), min(new_ob, ob_cap), time - 1))
         sol = max(sol, pos_sol)
 
     if ore_build:
-        pos_sol = solve2((blueprint, ore_robs + 1, clay_robs, ob_robs, geo_robs, min(new_ore - a, p * max(a, b, c, e)), min(new_clay, p * d), min(new_ob, p * f), time - 1))
+        pos_sol = solve2((blueprint, ore_robs + 1, clay_robs, ob_robs, geo_robs, min(new_ore - a, ore_cap), min(new_clay, clay_cap), min(new_ob, ob_cap), time - 1))
         sol = max(sol, pos_sol)
 
     if not geo_build or (ob_robs < f and (ore < c or clay < d)) or (clay_robs < d and (ore < b)) and (ore_robs < max(a, b, c, e) and (ore < a)):
-        pos_sol = solve2((blueprint, ore_robs, clay_robs, ob_robs, geo_robs, min(new_ore, p * max(a, b, c, e)), min(new_clay, p * d), min(new_ob, p * f), time - 1))
+        pos_sol = solve2((blueprint, ore_robs, clay_robs, ob_robs, geo_robs, min(new_ore, ore_cap), min(new_clay, clay_cap), min(new_ob, ob_cap), time - 1))
         sol = max(sol, pos_sol)
 
     m2[inp] = sol + geo_robs
